@@ -23,61 +23,18 @@
       "publication_status": "published",
       "template_id": "black-and-orange",
       "social_links": [
-        {
-          "id": "s1",
-          "platform": "github",
-          "url": "https://github.com/ashiacharya",
-          "label": "@ashiacharya"
-        },
-        {
-          "id": "s2",
-          "platform": "linkedin",
-          "url": "https://linkedin.com/in/ashiacharya",
-          "label": "Ashi Acharya"
-        },
-        {
-          "id": "s3",
-          "platform": "x",
-          "url": "https://x.com/ashi_codes",
-          "label": "@ashi_codes"
-        },
-        {
-          "id": "s4",
-          "platform": "instagram",
-          "url": "https://instagram.com/ashi.codes",
-          "label": "@ashi.codes"
-        },
-        {
-          "id": "s5",
-          "platform": "website",
-          "url": "https://ashi.dev",
-          "label": "ashi.dev"
-        }
+        { "id": "s1", "platform": "github", "url": "https://github.com/ashiacharya", "label": "@ashiacharya" },
+        { "id": "s2", "platform": "linkedin", "url": "https://linkedin.com/in/ashiacharya", "label": "Ashi Acharya" },
+        { "id": "s3", "platform": "x", "url": "https://x.com/ashi_codes", "label": "@ashi_codes" },
+        { "id": "s4", "platform": "instagram", "url": "https://instagram.com/ashi.codes", "label": "@ashi.codes" },
+        { "id": "s5", "platform": "website", "url": "https://ashi.dev", "label": "ashi.dev" }
       ],
       "projects": [
-        {
-          "id": "p1",
-          "title": "AgentCraft AI",
-          "description": "Autonomous agent orchestration engine for multi-step software synthesis.",
-          "url": "https://github.com/ashiacharya/agentcraft",
-          "tag": "TypeScript / AI"
-        },
-        {
-          "id": "p2",
-          "title": "Pulse UI",
-          "description": "Ultra-fast accessible design system for modern web products.",
-          "url": "https://pulseui.dev",
-          "tag": "React / Tailwind"
-        }
+        { "id": "p1", "title": "AgentCraft AI", "description": "Autonomous agent orchestration engine for multi-step software synthesis.", "url": "https://github.com/ashiacharya/agentcraft", "tag": "TypeScript / AI" },
+        { "id": "p2", "title": "Pulse UI", "description": "Ultra-fast accessible design system for modern web products.", "url": "https://pulseui.dev", "tag": "React / Tailwind" }
       ],
-      "skills": [
-        "TypeScript",
-        "React",
-        "Python",
-        "LLMs",
-        "Distributed Systems"
-      ],
-      "created_at": "2026-10-30T17:59:54.881Z",
+      "skills": ["TypeScript", "React", "Python", "LLMs", "Distributed Systems"],
+      "created_at": "2026-10-30T17:59:54.882Z",
       "updated_at": "2026-10-30T17:59:54.882Z"
     },
     {
@@ -95,47 +52,15 @@
       "publication_status": "published",
       "template_id": "minimal-white",
       "social_links": [
-        {
-          "id": "s6",
-          "platform": "github",
-          "url": "https://github.com/rahulverma",
-          "label": "@rahulverma"
-        },
-        {
-          "id": "s7",
-          "platform": "linkedin",
-          "url": "https://linkedin.com/in/rahulverma",
-          "label": "Rahul Verma"
-        },
-        {
-          "id": "s8",
-          "platform": "x",
-          "url": "https://x.com/rahul_infra",
-          "label": "@rahul_infra"
-        },
-        {
-          "id": "s9",
-          "platform": "website",
-          "url": "https://rahulverma.io",
-          "label": "rahulverma.io"
-        }
+        { "id": "s6", "platform": "github", "url": "https://github.com/rahulverma", "label": "@rahulverma" },
+        { "id": "s7", "platform": "linkedin", "url": "https://linkedin.com/in/rahulverma", "label": "Rahul Verma" },
+        { "id": "s8", "platform": "x", "url": "https://x.com/rahul_infra", "label": "@rahul_infra" },
+        { "id": "s9", "platform": "website", "url": "https://rahulverma.io", "label": "rahulverma.io" }
       ],
       "projects": [
-        {
-          "id": "p3",
-          "title": "KubeMesh",
-          "description": "Zero-overhead service mesh daemon for edge container clusters.",
-          "url": "https://github.com/rahulverma/kubemesh",
-          "tag": "Go / K8s"
-        }
+        { "id": "p3", "title": "KubeMesh", "description": "Zero-overhead service mesh daemon for edge container clusters.", "url": "https://github.com/rahulverma/kubemesh", "tag": "Go / K8s" }
       ],
-      "skills": [
-        "Go",
-        "Kubernetes",
-        "Docker",
-        "Rust",
-        "Terraform"
-      ],
+      "skills": ["Go", "Kubernetes", "Docker", "Rust", "Terraform"],
       "created_at": "2026-10-30T17:59:54.882Z",
       "updated_at": "2026-10-30T17:59:54.882Z"
     },
@@ -154,47 +79,15 @@
       "publication_status": "draft",
       "template_id": "editorial-cream",
       "social_links": [
-        {
-          "id": "s10",
-          "platform": "dribbble",
-          "url": "https://dribbble.com/priyadesigns",
-          "label": "priyadesigns"
-        },
-        {
-          "id": "s11",
-          "platform": "behance",
-          "url": "https://behance.net/priyasharma",
-          "label": "Priya Sharma"
-        },
-        {
-          "id": "s12",
-          "platform": "linkedin",
-          "url": "https://linkedin.com/in/priyasharma",
-          "label": "Priya Sharma"
-        },
-        {
-          "id": "s13",
-          "platform": "instagram",
-          "url": "https://instagram.com/priya.typeface",
-          "label": "@priya.typeface"
-        }
+        { "id": "s10", "platform": "dribbble", "url": "https://dribbble.com/priyadesigns", "label": "priyadesigns" },
+        { "id": "s11", "platform": "behance", "url": "https://behance.net/priyasharma", "label": "Priya Sharma" },
+        { "id": "s12", "platform": "linkedin", "url": "https://linkedin.com/in/priyasharma", "label": "Priya Sharma" },
+        { "id": "s13", "platform": "instagram", "url": "https://instagram.com/priya.typeface", "label": "@priya.typeface" }
       ],
       "projects": [
-        {
-          "id": "p4",
-          "title": "Editorial Noir",
-          "description": "Interactive typography specimen and kinetic web experience.",
-          "url": "https://priyasharma.design",
-          "tag": "Design / WebGL"
-        }
+        { "id": "p4", "title": "Editorial Noir", "description": "Interactive typography specimen and kinetic web experience.", "url": "https://priyasharma.design", "tag": "Design / WebGL" }
       ],
-      "skills": [
-        "Figma",
-        "Typography",
-        "Design Systems",
-        "Next.js",
-        "Framer"
-      ],
+      "skills": ["Figma", "Typography", "Design Systems", "Next.js", "Framer"],
       "created_at": "2026-10-30T17:59:54.882Z",
       "updated_at": "2026-10-30T17:59:54.882Z"
     },

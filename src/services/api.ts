@@ -1,6 +1,6 @@
 import { Participant, AppConfig, PublicationStatus } from '../types';
 
-const API_BASE = '/api';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/+$/, '');
 
 function getStoredToken(): string | null {
   return localStorage.getItem('uc_token') || localStorage.getItem('cid_token');
@@ -29,12 +29,25 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   const response = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
     headers,
-    credentials: 'omit', // or 'include'
+    credentials: 'include',
   });
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || `Request failed with status ${response.status}`);
+    let errorMsg = '';
+    try {
+      const errorData = await response.json();
+      errorMsg = errorData.error || errorData.message || '';
+    } catch {
+      const text = await response.text().catch(() => '');
+      if (response.status === 405) {
+        errorMsg = 'API method not allowed (405). Serverless routing is refreshing.';
+      } else if (response.status === 404) {
+        errorMsg = 'API endpoint not found (404).';
+      } else if (text && text.length < 120 && !text.includes('<!DOCTYPE')) {
+        errorMsg = text;
+      }
+    }
+    throw new Error(errorMsg || `Request failed with status ${response.status}`);
   }
 
   return response.json();
