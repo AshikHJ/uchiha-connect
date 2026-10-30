@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand-warm-white: #F8F4EC;
+    --brand-cream: #F1E7D7;
+    --brand-charcoal: #252525;
+    --brand-black: #111111;
+    --brand-orange: #E87942;
+    --brand-muted-grey: #8B8985;
+  }
+
+  body {
+    background-color: var(--brand-warm-white);
+    color: var(--brand-black);
+    font-family: 'Inter', 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D5CEBF;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B8B0A0;
+}
+
+/* Glassmorphism accent for cards */
+.editorial-card-shadow {
+  box-shadow: 0 10px 30px -5px rgba(25, 20, 15, 0.08), 0 0 0 1px rgba(226, 220, 210, 0.7);
+}
+
+.dark-card-shadow {
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
