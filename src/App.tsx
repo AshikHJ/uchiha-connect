@@ -35,6 +35,7 @@ const ProtectedOrganizerRoute: React.FC<{ children: React.ReactNode }> = ({ chil
 };
 
 export const AppContent: React.FC = () => {
+  const [participantsRevision, setParticipantsRevision] = useState(0);
   // Global Create / Edit Participant Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTargetSlot, setModalTargetSlot] = useState<number | undefined>(undefined);
@@ -63,10 +64,7 @@ export const AppContent: React.FC = () => {
       });
     }
 
-    if (shouldPublish) {
-      const pubRes = await api.participants.publish(saved.participant_id);
-      saved = pubRes.participant;
-    }
+    setParticipantsRevision(previous => previous + 1);
 
     return saved;
   };
@@ -88,14 +86,14 @@ export const AppContent: React.FC = () => {
         >
           <Route
             index
-            element={<StudioDashboard onOpenCreateModal={handleOpenCreateModal} />}
+            element={<StudioDashboard refreshKey={participantsRevision} onOpenCreateModal={handleOpenCreateModal} />}
           />
           <Route
             path="participants"
-            element={<StudioParticipants onOpenCreateModal={handleOpenCreateModal} />}
+            element={<StudioParticipants refreshKey={participantsRevision} onOpenCreateModal={handleOpenCreateModal} />}
           />
           <Route path="templates" element={<StudioTemplates />} />
-          <Route path="qr" element={<StudioQR />} />
+          <Route path="qr" element={<StudioQR refreshKey={participantsRevision} />} />
           <Route path="settings" element={<StudioSettings />} />
         </Route>
 

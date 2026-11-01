@@ -133,8 +133,8 @@ export const ParticipantModal: React.FC<ParticipantModalProps> = ({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 8 * 1024 * 1024) {
-      alert('Photo must be smaller than 8MB');
+    if (!['image/png', 'image/jpeg', 'image/webp', 'image/gif'].includes(file.type) || file.size > 1400000) {
+      alert('Choose a PNG, JPEG, WebP or GIF smaller than 1.4MB');
       return;
     }
 
@@ -237,7 +237,7 @@ export const ParticipantModal: React.FC<ParticipantModalProps> = ({
     skills,
     template_id: templateId,
     publication_status: 'draft',
-    design_json: (TEMPLATES.find((t) => t.id === templateId) || TEMPLATES[0]).defaultDesign,
+    design_json: (existingParticipant?.template_id === templateId && existingParticipant.design_json) || (TEMPLATES.find((t) => t.id === templateId) || TEMPLATES[0]).defaultDesign,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
@@ -265,6 +265,7 @@ export const ParticipantModal: React.FC<ParticipantModalProps> = ({
         projects,
         skills,
         template_id: templateId,
+        design_json: previewParticipant.design_json,
         slot_number: existingParticipant?.slot_number || targetSlotNumber,
       };
 

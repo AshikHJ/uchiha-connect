@@ -2,29 +2,30 @@ import { Participant, AppConfig, PublicationStatus } from '../types';
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/+$/, '');
 
-function getStoredToken(): string | null {
-  return localStorage.getItem('uc_token') || localStorage.getItem('cid_token');
-}
-
-export function setStoredToken(token: string | null): void {
-  if (token) {
-    localStorage.setItem('uc_token', token);
-  } else {
+// Browser sessions use HttpOnly cookies. Remove tokens left by older versions.
+export function setStoredToken(_token: string | null): void {
+  try {
     localStorage.removeItem('uc_token');
     localStorage.removeItem('cid_token');
+  } catch { /* Cookie sessions work even when browser storage is unavailable. */ }
+}
+
+export class ApiError extends Error {
+  attemptsLeft?: number;
+  lockoutRemaining?: number;
+  constructor(message: string, public status: number, details: Record<string, unknown> = {}) {
+    super(message);
+    if (typeof details.attemptsLeft === 'number') this.attemptsLeft = details.attemptsLeft;
+    if (typeof details.lockoutRemaining === 'number') this.lockoutRemaining = details.lockoutRemaining;
   }
 }
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const token = getStoredToken();
+  setStoredToken(null);
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string> || {}),
   };
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
 
   const response = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
@@ -33,21 +34,14 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   });
 
   if (!response.ok) {
-    let errorMsg = '';
+    const text = await response.text();
+    let details: Record<string, unknown> = {};
     try {
-      const errorData = await response.json();
-      errorMsg = errorData.error || errorData.message || '';
-    } catch {
-      const text = await response.text().catch(() => '');
-      if (response.status === 405) {
-        errorMsg = 'API method not allowed (405). Serverless routing is refreshing.';
-      } else if (response.status === 404) {
-        errorMsg = 'API endpoint not found (404).';
-      } else if (text && text.length < 120 && !text.includes('<!DOCTYPE')) {
-        errorMsg = text;
-      }
-    }
-    throw new Error(errorMsg || `Request failed with status ${response.status}`);
+      const parsed = JSON.parse(text);
+      if (parsed && typeof parsed === 'object') details = parsed;
+    } catch { /* Non-JSON gateway errors. */ }
+    const message = typeof details.error === 'string' ? details.error : `Request failed with status ${response.status}`;
+    throw new ApiError(message, response.status, details);
   }
 
   return response.json();
@@ -60,9 +54,6 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ pin }),
       });
-      if (res.token) {
-        setStoredToken(res.token);
-      }
       return res;
     },
 

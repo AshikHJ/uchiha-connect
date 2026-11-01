@@ -4,7 +4,8 @@ import { Participant, CanvasElement, CardDesign, Template } from '../types';
 import { api } from '../services/api';
 import { TEMPLATES } from '../templates/templates';
 import { CardPreview } from '../components/profile/CardPreview';
-import { BrandIcon } from '../components/common/BrandIcon';
+import { DesignElement, resolveElementContent } from '../components/profile/DesignElement';
+import { getParticipantPublicUrl } from '../utils/qrcode';
 import {
   Undo2,
   Redo2,
@@ -212,6 +213,10 @@ export const StudioEditor: React.FC = () => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!['image/png', 'image/jpeg', 'image/webp', 'image/gif'].includes(file.type) || file.size > 1400000) {
+      alert('Choose a PNG, JPEG, WebP or GIF smaller than 1.4MB');
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -299,7 +304,6 @@ export const StudioEditor: React.FC = () => {
       });
 
       if (shouldPublish) {
-        await api.participants.publish(participant.participant_id);
         confetti({ particleCount: 80, spread: 60 });
       }
 
@@ -795,7 +799,7 @@ export const StudioEditor: React.FC = () => {
           {isPreviewMode ? (
             /* Live Interactive Preview Mode */
             <div className="animate-fadeIn">
-              <CardPreview participant={participant} />
+              <CardPreview participant={{ ...participant, design_json: design }} />
             </div>
           ) : (
             /* Editable Card Canvas */
@@ -817,15 +821,6 @@ export const StudioEditor: React.FC = () => {
               {design.elements.map((el) => {
                 const isSelected = el.id === selectedElementId;
 
-                // Resolve content if bound to participant property
-                let displayContent = el.content;
-                if (el.fieldBinding && participant) {
-                  const val = (participant as any)[el.fieldBinding];
-                  if (val && typeof val === 'string') {
-                    displayContent = val;
-                  }
-                }
-
                 return (
                   <div
                     key={el.id}
@@ -840,100 +835,23 @@ export const StudioEditor: React.FC = () => {
                       top: el.y,
                       width: el.width,
                       height: el.height,
+                      transform: `rotate(${el.rotation || 0}deg)`,
                       opacity: el.opacity !== undefined ? el.opacity : 1,
                       zIndex: isSelected ? 30 : el.style.zIndex || 1,
                     }}
                   >
-                    {/* Element Renderers */}
-                    {el.type === 'text' && (
-                      <div
-                        contentEditable={isSelected}
-                        suppressContentEditableWarning
-                        onBlur={(e) =>
-                          updateSelectedElement({ content: e.currentTarget.textContent || '' })
-                        }
-                        className="w-full h-full flex items-center outline-none"
-                        style={{
-                          fontSize: el.style.fontSize || 16,
-                          fontWeight: el.style.fontWeight || 500,
-                          color: el.style.color || '#FFFFFF',
-                          fontFamily: el.style.fontFamily || design.theme.fontFamily,
-                          justifyContent:
-                            el.style.textAlign === 'center'
-                              ? 'center'
-                              : el.style.textAlign === 'right'
-                              ? 'flex-end'
-                              : 'flex-start',
-                          letterSpacing: el.style.letterSpacing,
-                          lineHeight: el.style.lineHeight,
+                    {el.type === 'text' ? (
+                      <div contentEditable={isSelected} suppressContentEditableWarning
+                        onBlur={e => {
+                          const content = e.currentTarget.textContent || '';
+                          if (content !== resolveElementContent(el, participant)) {
+                            pushHistory({ ...design, elements: design.elements.map(item => item.id === el.id ? { ...item, content, fieldBinding: undefined } : item) });
+                          }
                         }}
-                      >
-                        {displayContent}
+                        className="w-full h-full outline-none">
+                        <DesignElement element={el} participant={participant} design={design} publicUrl={getParticipantPublicUrl(participant.username)} />
                       </div>
-                    )}
-
-                    {el.type === 'avatar' && (
-                      <div
-                        className="w-full h-full overflow-hidden shadow-md"
-                        style={{
-                          borderRadius: el.style.borderRadius !== undefined ? el.style.borderRadius : 9999,
-                          border: `${el.style.borderWidth || 2}px solid ${el.style.borderColor || '#FFFFFF'}`,
-                        }}
-                      >
-                        <img
-                          src={el.content || participant.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300'}
-                          alt="Avatar"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
-
-                    {el.type === 'shape' && (
-                      <div
-                        className="w-full h-full"
-                        style={{
-                          backgroundColor: el.style.backgroundColor || design.theme.accentColor,
-                          borderRadius: el.style.borderRadius || 12,
-                          border: el.style.borderWidth ? `${el.style.borderWidth}px solid ${el.style.borderColor}` : 'none',
-                        }}
-                      />
-                    )}
-
-                    {el.type === 'badge' && (
-                      <div
-                        className="w-full h-full flex items-center justify-center font-bold px-3 uppercase tracking-wider"
-                        style={{
-                          fontSize: el.style.fontSize || 11,
-                          color: el.style.color || '#E87942',
-                          backgroundColor: el.style.backgroundColor || 'rgba(232, 121, 66, 0.2)',
-                          borderRadius: el.style.borderRadius || 9999,
-                        }}
-                      >
-                        {displayContent}
-                      </div>
-                    )}
-
-                    {el.type === 'divider' && (
-                      <div
-                        className="w-full h-full"
-                        style={{
-                          backgroundColor: el.style.backgroundColor || 'rgba(255,255,255,0.2)',
-                        }}
-                      />
-                    )}
-
-                    {el.type === 'social_group' && (
-                      <div className="w-full h-full flex items-center justify-center gap-2">
-                        {participant.social_links?.slice(0, 4).map((s) => (
-                          <div
-                            key={s.id}
-                            className="p-2 rounded-xl bg-zinc-800/80 border border-zinc-700 text-white"
-                          >
-                            <BrandIcon platform={s.platform} size={16} />
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    ) : <DesignElement element={el} participant={participant} design={design} publicUrl={getParticipantPublicUrl(participant.username)} />}
 
                     {/* Resize Handle (bottom-right) */}
                     {isSelected && !el.locked && (
@@ -1042,8 +960,8 @@ export const StudioEditor: React.FC = () => {
                     <label className="text-[10px] text-zinc-500 block mb-1">Text Content</label>
                     <input
                       type="text"
-                      value={selectedElement.content || ''}
-                      onChange={(e) => updateSelectedElement({ content: e.target.value })}
+                      value={resolveElementContent(selectedElement, participant)}
+                      onChange={(e) => updateSelectedElement({ content: e.target.value, fieldBinding: undefined })}
                       className="w-full text-xs px-2.5 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-white"
                     />
                   </div>

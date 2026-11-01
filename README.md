@@ -1,117 +1,116 @@
-# UCHIHA CONNECT STUDIO (UC)
+# UCHIHA CONNECT STUDIO
 
-> **One Identity. Every Connection.**  
-> A premium digital business card creation platform inspired by Blinq and Canva, engineered for hackathon organizers to manage, customize, and individually publish up to 30 participant cards without participant logins.
+Digital business cards with an organizer studio, visual editor, public profiles,
+vCards and QR exports. React 18 + TypeScript + Vite, with an Express API.
 
----
+## Run locally
 
-## ✦ Brand & Visual Identity
+Use Node.js 22.12 or newer.
 
-- **Official Brand Name:** UCHIHA CONNECT
-- **Short Name / Abbreviation:** UC
-- **Tagline:** One Identity. Every Connection.
-- **Charcoal Black:** `#111111`
-- **Deep Crimson:** `#B51F35`
-- **White:** `#FFFFFF`
-- **Muted Grey:** `#8B8985`
-- **Warm White:** `#F8F4EC`
-- **Cream:** `#F1E7D7`
-- **Typography:** Inter, Manrope, DM Serif Display, JetBrains Mono
-
----
-
-## ✦ Key Features
-
-1. **PIN-Protected Organizer Access**
-   - Zero participant sign-up or accounts required.
-   - Secure server-side PIN authentication with PBKDF2 with SHA-256 and salted hashing.
-   - HMAC signed session token in HttpOnly secure cookie or Bearer token.
-   - Built-in rate limiting (max 5 failed attempts per 15 minutes) with an automated lockout countdown.
-
-2. **30 Pre-Seeded Participant Slots**
-   - Pre-configured slots `CID-001` through `CID-030`.
-   - Independent publishing state machine: `draft`, `published`, `unpublished`.
-   - Publishing one card never exposes or affects other cards.
-
-3. **Simple Participant Creation Workflow**
-   - Prominent **`+ CREATE NEW CARD`** action.
-   - Personal information: Full name, profile photo (file upload or URL), headline, bio, college, department, email, phone.
-   - Automatic social icon detection: Paste any URL (Instagram, LinkedIn, GitHub, X, YouTube, Behance, Dribbble, Website) and UC automatically recognizes the platform and attaches official brand icons.
-   - Live mobile card preview side-by-side with the editor.
-   - Post-publication drawer with instant public link, copy button, QR download, and `+ CREATE NEXT CARD` (which clears the form while keeping previous participants intact).
-
-4. **Canva-Style Visual Card Editor (`/studio/editor/:id`)**
-   - Full drag-and-drop element repositioning.
-   - Resize handles with multi-axis support.
-   - In-line and sidebar typography controls (font size, weight, color, alignment).
-   - Card background and theme color customization.
-   - Multi-step Undo and Redo history stack.
-   - Structured JSON design persistence.
-
-5. **10 Original Handcrafted Templates**
-   1. *Minimal White* — Scandinavian gallery aesthetic.
-   2. *Premium Black* — Obsidian luxury with metallic borders.
-   3. *Crimson & Charcoal Developer* — Signature UCHIHA CONNECT deep crimson palette.
-   4. *Editorial Cream* — Warm cream with DM Serif Display editorial typography.
-   5. *Futuristic Technology* — Cyber slate with neon cyan accents.
-   6. *Professional Blue* — Executive navy and cobalt trust.
-   7. *Creative Gradient* — Sunset coral/orange banner with glass cards.
-   8. *Luxury Black and Gold* — Brushed gold typography and matte charcoal.
-   9. *Modern Portfolio* — Split-view showcase with large photo emphasis.
-   10. *Minimal Dark* — Matte graphite with crisp typography.
-
-6. **Public Participant Digital Cards (`/p/:username`)**
-   - Permanent URLs: `/p/ashi`, `/p/rahul`, `/p/priya`.
-   - Mobile-first, responsive on iOS, Android, tablets, and desktops.
-   - Instant "Save Contact" (generates and downloads RFC-compliant vCard `.vcf`).
-   - One-click share with QR popup modal.
-   - Direct mail, phone, and social links opening safely in new tabs (`rel="noopener noreferrer"`).
-   - Strictly blocks access to draft or unpublished cards with an elegant unavailable notice.
-
-7. **Print-Ready QR Codes & Bulk ZIP Export**
-   - Unique high-resolution QR codes (PNG & SVG).
-   - Print badge layout containing participant name, ID, and UCHIHA CONNECT banner.
-   - Single-click bulk ZIP export generating all 30 QR codes organized with an `INDEX.md`.
-
----
-
-## ✦ Getting Started (Local Development)
-
-### 1. Start Backend API Server
-```bash
-node server/index.js
-# Runs on http://localhost:3001
+```sh
+npm ci
+npm run server
 ```
 
-### 2. Start Vite Frontend
-```bash
+In a second terminal:
+
+```sh
 npm run dev
-# Runs on http://localhost:5173
 ```
 
-### 3. Open Organizer Studio
-Navigate to `http://localhost:5173/studio`.
-- Default Organizer PIN: **`2026`**
+Open http://localhost:5173/studio. The **local demo PIN is 2026**. Local startup
+creates 30 slots, including three demo profiles. The backend loads `.env`
+automatically; copying `.env.example` is optional for local development.
 
----
+Local data lives in `server/data/local-db.json`, which is excluded from Git.
+Writes use atomic file replacement and revision checks. Use one local backend
+process; use Supabase for multiple instances or any production deployment.
+Database write failures return errors rather than claiming a successful save.
 
-## ✦ Supabase Setup (Optional Production Database)
+## Production / Vercel
 
-1. Open your Supabase Dashboard.
-2. Go to the **SQL Editor**.
-3. Paste and run the migration file from:
-   `supabase/migrations/001_create_tables.sql`
-4. Copy your Supabase URL and keys into `.env`:
-   ```env
-   VITE_SUPABASE_URL=https://your-project.supabase.co
-   VITE_SUPABASE_ANON_KEY=your-anon-key
-   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-   ```
+1. Create a Supabase project. Run
+   `supabase/migrations/002_persistent_state.sql` in its SQL Editor.
+   Migration 002 is standalone; the tables in 001 are legacy schema and are not
+   used by the updated API.
+2. Configure **server-side** environment variables:
+   - `SUPABASE_URL`: your project URL.
+   - `SUPABASE_SERVICE_ROLE_KEY`: your service-role key, kept secret.
+   - `SESSION_SECRET`: a unique random secret of at least 32 characters. Generate
+     one with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
+   - `ORGANIZER_PIN`: a private 6-12 digit PIN for first initialization.
+   - `PRODUCTION_DOMAIN`: your actual public HTTPS origin, used for QR links.
+3. Import the repository into Vercel as a Vite project. Build with `npm run build`
+   and use `dist` as the output directory. `api/index.js` serves the API through
+   the routes in `vercel.json`. Vercel sets `VERCEL`; for other hosts set
+   `NODE_ENV=production` and serve the built frontend separately from the API.
+4. Sign in with the configured PIN, create a card, save and publish it. Visit
+   `/p/<username>`, and verify it again after a fresh deployment. Verify both
+   desktop and mobile presentation before distributing QR codes.
 
----
+Production refuses to use temporary files or the former public session secret.
+The API stores a private JSON state document in `uc_app_state`; revision checks
+return HTTP 409 if another request has changed it. Reload before retrying.
+The service-role key stays in the backend; anonymous clients cannot read this
+state document or PIN settings directly. Public profiles pass through the API,
+which checks their publication status.
 
-## ✦ Vercel Deployment
+`ORGANIZER_PIN` initializes a new database only. Change an existing PIN in
+Settings. PIN changes revoke old sessions while retaining the current browser
+session. **Logout revokes all organizer sessions** (this app has one organizer).
+Cookies are HttpOnly, SameSite=Lax, and Secure in production. The browser no
+longer saves session tokens in localStorage. API clients can still use the
+login response's bearer token.
 
-1. Import the repository into [Vercel](https://vercel.com).
-2. Configure the environment variables from `.env.example`.
-3. Deploy!
+Login attempts are counted atomically in Supabase: up to five submissions per
+IP per 15-minute window, including successful logins. HTTP 429 includes
+`Retry-After` and a countdown. Local development uses an in-process limiter.
+`TRUST_PROXY_HOPS` must match your ingress (defaults to 1 on Vercel, 0 locally).
+Set `ALLOWED_ORIGINS` only for additional trusted frontend origins; the usual
+same-origin deployment needs none. Cookies require a same-site frontend/API.
+
+### Existing data
+
+Back up existing data before switching deployment versions. Migration 002 does
+not automatically import `server/data/db.json`, the legacy SQL tables, or an old
+serverless instance's temporary file. The committed `db.json` is retained as a
+legacy demo fixture and is no longer used as live storage. Existing cards can
+be exported/imported as CSV through the studio, but CSV does not retain visual
+editor layouts; preserve a full JSON backup for custom designs. Production
+initializes empty participant slots and never publishes demo data.
+
+## Card designs and uploads
+
+The editor, live preview and public saved-design renderer share the same element
+renderer. It supports positioning, typography, rotation, opacity, avatars,
+shapes, badges, dividers, social links, project cards, contact buttons and QR
+codes. The preview includes unsaved edits. Editing participant details preserves
+a custom design unless a different template is chosen. Legacy cards without a
+saved design retain their original layout until saved through the editor.
+
+Save Contact, Share, Email and Call remain available alongside custom designs.
+Images are stored as inline data in the persisted card document, not a separate
+Supabase Storage upload. Choose PNG/JPEG/WebP/GIF files smaller than 1.4 MB.
+The API body limit is 4 MB; larger multi-image designs should use HTTPS image URLs.
+
+## Verification
+
+```sh
+npm test
+npm run build
+npm audit --audit-level=moderate
+```
+
+`npm run test:api` and `npm run test:serverless` run the same self-contained
+HTTP regression suite through the serverless entrypoint. Tests use isolated
+temporary databases, assert outcomes, and exit nonzero on failures. They cover
+publication, saved designs, authentication, session revocation, input validation,
+CORS, local persistence across a fresh process, revision conflicts, production
+configuration guards, and the Supabase client's HTTP/RPC behavior. An embedded
+PostgreSQL test also applies migration 002 and checks permissions, revision
+updates, throttling, and lockout expiry.
+
+Supabase protocol tests use a controlled PostgREST fixture. They do not prove
+that a live project's SQL, RLS or deployment credentials are configured; complete
+the production checks above in your own project. CI runs the tests, build and
+dependency audit on pushes and pull requests.

@@ -1,5 +1,11 @@
 node_modules/
+dist/
+*.tsbuildinfo
 .DS_Store
 *.log
 .env
-.env.local
+.env.*
+!.env.example
+server/data/local-db.json
+server/data/*.tmp
+.test-tmp/

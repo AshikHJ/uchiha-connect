@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { DesignedCard } from './DesignedCard';
+import { safeUrl } from './DesignElement';
 import { Participant, Template } from '../../types';
 import { BrandIcon } from '../common/BrandIcon';
 import { getTemplateById } from '../../templates/templates';
@@ -37,7 +39,8 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
   const [savedContact, setSavedContact] = useState(false);
 
   const activeTemplate = templateOverride || getTemplateById(participant.template_id || 'black-and-orange');
-  const theme = activeTemplate.theme;
+  const design = templateOverride?.defaultDesign || participant.design_json;
+  const theme = design?.theme || activeTemplate.theme;
 
   const publicUrl = getParticipantPublicUrl(participant.username, productionDomain);
 
@@ -73,15 +76,23 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
 
   // Safe external link opener
   const openExternal = (url: string) => {
-    window.open(url, '_blank', 'noopener,noreferrer');
+    const safe = safeUrl(url);
+    if (safe) window.open(safe, '_blank', 'noopener,noreferrer');
   };
 
   const isDark = ['dark', 'cyber'].includes(theme.styleMode);
 
   return (
     <div className="w-full max-w-[420px] mx-auto transition-all duration-300">
-      {/* Outer Card Shell */}
-      <div
+      {design ? <>
+        <DesignedCard design={design} participant={participant} publicUrl={publicUrl} />
+        <div className="flex flex-wrap justify-center gap-3 mt-4 p-3 rounded-xl bg-white text-black text-sm">
+          <button onClick={handleSaveContact} className="px-3 py-2 rounded-lg border">{savedContact ? 'Saved!' : 'Save Contact'}</button>
+          <button onClick={handleShareClick} className="px-3 py-2 rounded-lg border">Share</button>
+          {participant.email && <a className="px-3 py-2" href={`mailto:${participant.email}`}>Email</a>}
+          {participant.phone && <a className="px-3 py-2" href={`tel:${participant.phone}`}>Call</a>}
+        </div>
+      </> : <div
         className="relative overflow-hidden rounded-[28px] transition-all duration-300 shadow-card"
         style={{
           backgroundColor: theme.cardBackground,
@@ -415,7 +426,7 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
             <span className="text-[9px] text-brand-mutedGrey font-medium">{BRAND.tagline}</span>
           </div>
         </div>
-      </div>
+      </div>}
 
       {/* QR & Share Modal */}
       {showQrModal && (
