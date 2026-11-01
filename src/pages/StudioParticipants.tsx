@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 
 interface StudioParticipantsProps {
+  refreshKey?: number;
   onOpenCreateModal: (targetSlot?: number, participant?: Participant) => void;
   onOpenPreviewModal?: (participant: Participant) => void;
 }
@@ -37,6 +38,7 @@ interface StudioParticipantsProps {
 export const StudioParticipants: React.FC<StudioParticipantsProps> = ({
   onOpenCreateModal,
   onOpenPreviewModal,
+  refreshKey = 0,
 }) => {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [config, setConfig] = useState<AppConfig | null>(null);
@@ -71,7 +73,7 @@ export const StudioParticipants: React.FC<StudioParticipantsProps> = ({
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [refreshKey]);
 
   // Filter and sort participants
   const filteredParticipants = participants

@@ -72,8 +72,8 @@ export const StudioSettings: React.FC = () => {
     e.preventDefault();
     setPinMessage(null);
 
-    if (newPin.length < 4) {
-      setPinMessage({ text: 'New PIN must be at least 4 digits', isError: true });
+    if (!/^\d{6,12}$/.test(newPin)) {
+      setPinMessage({ text: 'New PIN must be 6-12 digits', isError: true });
       return;
     }
 
@@ -220,7 +220,7 @@ export const StudioSettings: React.FC = () => {
                 type="password"
                 value={currentPin}
                 onChange={(e) => setCurrentPin(e.target.value)}
-                placeholder="Current PIN (Default: 2026)"
+                placeholder="Current PIN"
                 className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-brand-border bg-brand-warmWhite focus:outline-none focus:border-brand-orange"
                 required
               />
@@ -228,7 +228,7 @@ export const StudioSettings: React.FC = () => {
 
             <div>
               <label className="block text-xs font-semibold text-brand-black mb-1">
-                New PIN (minimum 4 digits)
+                New PIN (6-12 digits)
               </label>
               <input
                 type="password"

@@ -20,7 +20,7 @@ import {
   Copy,
 } from 'lucide-react';
 
-export const StudioQR: React.FC = () => {
+export const StudioQR: React.FC<{ refreshKey?: number }> = ({ refreshKey = 0 }) => {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [config, setConfig] = useState<AppConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -50,7 +50,7 @@ export const StudioQR: React.FC = () => {
       }
     }
     loadData();
-  }, []);
+  }, [refreshKey]);
 
   const selectParticipant = async (p: Participant, domain?: string) => {
     setSelectedParticipant(p);

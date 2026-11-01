@@ -20,6 +20,8 @@ export const PublicProfile: React.FC = () => {
         return;
       }
 
+      setIsLoading(true);
+      setErrorMessage(null);
       try {
         const res = await api.publicProfile.getByUsername(username);
         setParticipant(res.participant);

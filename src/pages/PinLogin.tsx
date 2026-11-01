@@ -20,7 +20,7 @@ export const PinLogin: React.FC = () => {
 
   const handleDigitClick = (digit: string) => {
     if (lockoutRemaining > 0) return;
-    if (pin.length < 8) {
+    if (pin.length < 12) {
       clearError();
       setPin((prev) => prev + digit);
     }
@@ -60,7 +60,7 @@ export const PinLogin: React.FC = () => {
               Enter Access PIN
             </span>
           </div>
-          <span className="text-[11px] font-mono text-brand-mutedGrey">Default: 2026</span>
+          {import.meta.env.DEV && <span className="text-[11px] font-mono text-brand-mutedGrey">Demo: 2026</span>}
         </div>
 
         {/* Lockout or Error Alert */}
@@ -70,7 +70,7 @@ export const PinLogin: React.FC = () => {
             <div>
               <p className="font-bold">Security Lockout Active</p>
               <p className="text-[11px] mt-0.5">
-                Too many failed attempts. Try again in{' '}
+                Too many login attempts. Try again in{' '}
                 <span className="font-mono font-bold">{lockoutRemaining}s</span>.
               </p>
             </div>
@@ -85,7 +85,7 @@ export const PinLogin: React.FC = () => {
         {/* PIN Dots Display */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex justify-center items-center gap-3 py-2">
-            {[0, 1, 2, 3].map((idx) => (
+            {Array.from({ length: Math.max(4, pin.length) }, (_, index) => index).map((idx) => (
               <div
                 key={idx}
                 className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${
@@ -99,8 +99,11 @@ export const PinLogin: React.FC = () => {
 
           {/* Hidden or standard text input */}
           <input
+            aria-label="Organizer PIN"
+            inputMode="numeric"
+            autoComplete="current-password"
             type="password"
-            maxLength={8}
+            maxLength={12}
             value={pin}
             onChange={(e) => {
               clearError();

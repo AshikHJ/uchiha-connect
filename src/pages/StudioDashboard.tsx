@@ -21,10 +21,11 @@ import {
 } from 'lucide-react';
 
 interface StudioDashboardProps {
+  refreshKey?: number;
   onOpenCreateModal: (targetSlot?: number, participant?: Participant) => void;
 }
 
-export const StudioDashboard: React.FC<StudioDashboardProps> = ({ onOpenCreateModal }) => {
+export const StudioDashboard: React.FC<StudioDashboardProps> = ({ onOpenCreateModal, refreshKey = 0 }) => {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [config, setConfig] = useState<AppConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,7 +46,7 @@ export const StudioDashboard: React.FC<StudioDashboardProps> = ({ onOpenCreateMo
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [refreshKey]);
 
   const totalSlots = config?.totalSlots || 30;
   const filledParticipants = participants.filter((p) => p.full_name && p.full_name.trim() !== '');
